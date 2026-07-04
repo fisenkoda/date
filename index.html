@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Для Ксюши 💙</title>
+<style>
+  :root{
+    --blue:#8ec5ff;
+    --blue-deep:#4f97ee;
+    --violet:#b18cff;
+    --violet-deep:#7c5cf0;
+    --pink:#ffc9e4;
+    --ink:#3f3d6b;
+    --ink-soft:#7d78a8;
+    --card:rgba(255,255,255,.74);
+    --shadow:0 12px 40px rgba(110,110,220,.24);
+    --radius:26px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;margin:0;overflow:hidden;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg,#d3e9ff 0%,#dfe0ff 48%,#ecdfff 100%);
+    -webkit-font-smoothing:antialiased;user-select:none;
+  }
+
+  #hearts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .heart{position:absolute;bottom:-40px;opacity:0;animation:float linear infinite;}
+  @keyframes float{
+    0%{transform:translateY(0) scale(.6) rotate(0deg);opacity:0;}
+    10%{opacity:.5;}
+    90%{opacity:.38;}
+    100%{transform:translateY(-115vh) scale(1) rotate(22deg);opacity:0;}
+  }
+
+  .stage{position:relative;z-index:1;height:100%;width:100%;}
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 26px calc(32px + env(safe-area-inset-bottom));
+    text-align:center;
+    opacity:0;visibility:hidden;transform:translateX(40px);
+    transition:opacity .55s ease,transform .55s ease,visibility .55s;
+    gap:20px;
+  }
+  .slide.active{opacity:1;visibility:visible;transform:translateX(0);}
+
+  /* фото */
+  .photo{
+    width:158px;height:158px;border-radius:50%;object-fit:cover;
+    border:3px solid rgba(255,255,255,.8);box-shadow:var(--shadow);
+    background:linear-gradient(135deg,var(--blue),var(--violet));
+  }
+  .photo.her{object-position:center 46%;}
+  .photo.him-solo{width:190px;height:250px;border-radius:24px;object-position:center 12%;}
+  .photo.wide{width:230px;height:158px;border-radius:22px;object-position:center 55%;}
+  .photo.poster{width:172px;height:246px;border-radius:16px;object-fit:cover;}
+
+  /* два фото рядом = "мы", формат 4:5 */
+  .duo{display:flex;align-items:center;justify-content:center;gap:12px;}
+  .duo img{
+    width:150px;height:188px;border-radius:18px;object-fit:cover;object-position:center;
+    border:3px solid rgba(255,255,255,.85);box-shadow:var(--shadow);
+    background:linear-gradient(135deg,var(--blue),var(--violet));
+  }
+  .duo.big img{width:168px;height:210px;}
+
+  /* декоративное голубое сердце для вопроса без фото */
+  .deco{width:92px;height:84px;filter:drop-shadow(0 8px 18px rgba(79,151,238,.35));}
+
+  h1{font-size:30px;line-height:1.25;margin:0;font-weight:800;
+     background:linear-gradient(90deg,var(--blue-deep),var(--violet-deep));
+     -webkit-background-clip:text;background-clip:text;color:transparent;}
+  p.sub{font-size:18px;line-height:1.5;margin:0;color:var(--ink);max-width:520px;}
+  p.note{font-size:14px;color:var(--ink-soft);line-height:1.5;max-width:480px;margin:0;}
+  .warn{background:rgba(255,255,255,.6);border-radius:16px;padding:12px 16px;font-size:15px;
+        color:var(--ink);max-width:500px;border:1px solid rgba(79,151,238,.4);}
+
+  textarea{
+    width:100%;max-width:460px;min-height:92px;resize:none;
+    border:2px solid rgba(124,92,240,.4);border-radius:18px;
+    padding:14px 16px;font-size:16px;font-family:inherit;color:var(--ink);
+    background:var(--card);outline:none;transition:border .2s;
+  }
+  textarea:focus{border-color:var(--violet-deep);}
+
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:18px;font-weight:700;color:#fff;
+    padding:15px 40px;border-radius:40px;
+    background:linear-gradient(90deg,var(--blue-deep),var(--violet-deep));
+    box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s,opacity .3s;
+  }
+  .btn:active{transform:scale(.96);}
+  .btn.disabled{opacity:.4;pointer-events:none;filter:grayscale(.4);}
+  .btn.ghost{background:linear-gradient(90deg,#b9c7e6,#a8b0d8);}
+
+  .row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;}
+
+  .datecard{
+    background:var(--card);border:2px solid rgba(124,92,240,.4);border-radius:20px;
+    padding:20px 26px;cursor:pointer;transition:.18s;min-width:150px;
+  }
+  .datecard .dow{font-size:15px;color:var(--ink-soft);}
+  .datecard .d{font-size:24px;font-weight:800;color:var(--ink);margin:4px 0;}
+  .datecard .t{font-size:14px;color:var(--ink-soft);}
+  .datecard.sel{background:linear-gradient(135deg,var(--blue),var(--violet));border-color:transparent;}
+  .datecard.sel .dow,.datecard.sel .d,.datecard.sel .t{color:#fff;}
+
+  .no-btn{position:relative;z-index:5;transition:left .12s,top .12s,transform .18s;}
+  .no-btn.floating{position:fixed;}
+  .no-btn.chaos{transition:left .1s linear,top .1s linear;}
+
+  #musicToggle{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;z-index:20;
+    width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--card);box-shadow:var(--shadow);font-size:20px;display:none;align-items:center;justify-content:center;}
+
+  @media (max-width:430px){
+    h1{font-size:25px;}
+    p.sub{font-size:17px;}
+    .btn{font-size:17px;padding:14px 32px;}
+    .duo img{width:145px;height:181px;}
+    .duo.big img{width:158px;height:198px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="hearts"></div>
+<button id="musicToggle" title="музыка">🔊</button>
+<audio id="bg" loop>
+  <source src="music/track.mp3" type="audio/mpeg">
+</audio>
+
+<div class="stage" id="stage">
+
+  <!-- 0. СТАРТ -->
+  <section class="slide active" data-i="0">
+    <img class="photo her" src="img/her_face.png" alt="">
+    <h1>Ксюш, привет 💙</h1>
+    <p class="sub">У меня к тебе несколько вопросов —<br>буквально одну минуту</p>
+    <button class="btn" onclick="start()">Открыть →</button>
+  </section>
+
+  <!-- 1. ВОПРОС: момент с теплом -->
+  <section class="slide" data-i="1">
+    <div class="duo">
+      <img class="her" src="img/her45.png" alt="">
+      <img class="him" src="img/him45.png" alt="">
+    </div>
+    <h1>Какой момент со мной ты<br>вспоминаешь с теплом?</h1>
+    <textarea data-key="q_moment" oninput="checkText(this)" placeholder="напиши здесь…"></textarea>
+    <button class="btn disabled" data-next onclick="next(this)">Дальше →</button>
+  </section>
+
+  <!-- 2. ВОПРОС: чего ещё не делал -->
+  <section class="slide" data-i="2">
+    <svg class="deco" viewBox="0 0 32 29"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8ec5ff"/><stop offset="1" stop-color="#7c5cf0"/></linearGradient></defs>
+      <path d="M16 29S2 19.4 2 9.9C2 4.9 5.9 2 9.6 2 12.7 2 15 4 16 6.1 17 4 19.3 2 22.4 2 26.1 2 30 4.9 30 9.9 30 19.4 16 29 16 29z" fill="url(#g2)"/></svg>
+    <h1>Что бы ты хотела, чтобы я<br>сделал, но ещё не делал?</h1>
+    <textarea data-key="q_zhelanie" oninput="checkText(this)" placeholder="напиши здесь…"></textarea>
+    <button class="btn disabled" data-next onclick="next(this)">Дальше →</button>
+  </section>
+
+  <!-- 3. ПРИГЛАШЕНИЕ -->
+  <section class="slide" data-i="3">
+    <div class="duo big">
+      <img class="her" src="img/her45.png" alt="">
+      <img class="him" src="img/him45.png" alt="">
+    </div>
+    <h1>Ксюш, я тут кое-что<br>придумал для тебя…</h1>
+    <p class="sub">но сначала — пойдёшь со мной на свидание? 💋</p>
+    <div class="row">
+      <button class="btn" onclick="sayYes()">Да</button>
+      <button class="btn ghost no-btn" id="no1">Нет</button>
+    </div>
+  </section>
+
+  <!-- 4. УВЕРЕНА -->
+  <section class="slide" data-i="4">
+    <div class="deco" style="font-size:64px;line-height:1;height:auto">😢</div>
+    <h1>Уверена?</h1>
+    <div class="row">
+      <button class="btn" onclick="sayYes()">Нет, конечно да 💙</button>
+      <button class="btn ghost" id="tochno">Точно нет</button>
+    </div>
+    <p class="note" id="tochnonet" style="visibility:hidden">эта кнопка, кажется, сломалась 😄</p>
+  </section>
+
+  <!-- 5. КИНО -->
+  <section class="slide" data-i="5">
+    <img class="photo poster" src="img/poster.png" alt="">
+    <h1>Первое 🎬</h1>
+    <p class="sub">В среду, 8 июля — идём в кино на «Майкл»<br>(про Майкла Джексона)</p>
+    <p class="note">Сеанс в 20:50 · ДК «Юность», Саянск · билеты уже куплены 🎟️</p>
+    <div class="warn">⚠️ Важно: отпросись к <b>20:30</b> — в 20:35 за тобой приедет такси 🚕<br>Сеанс идёт 2 ч 10 мин, обратно тоже такси</div>
+    <div class="row">
+      <button class="btn" onclick="go(6)">Хорошо, отпрошусь ✅</button>
+      <button class="btn ghost no-btn" id="no2">Нет</button>
+    </div>
+  </section>
+
+  <!-- 6. ВЫБОР ДАТЫ -->
+  <section class="slide" data-i="6">
+    <img class="photo wide" src="img/city.png" alt="">
+    <h1>А ещё 🎥</h1>
+    <p class="sub">Хочу украсть тебя на вечер — поедем в город,<br>кое-что для тебя сниму и погуляем 💙</p>
+    <p class="note">Когда тебе удобнее?</p>
+    <div class="row">
+      <div class="datecard" onclick="pickDate(this,'Понедельник, 6 июля')">
+        <div class="dow">Понедельник</div><div class="d">6 июля</div><div class="t">после 21:00 🌙</div>
+      </div>
+      <div class="datecard" onclick="pickDate(this,'Вторник, 7 июля')">
+        <div class="dow">Вторник</div><div class="d">7 июля</div><div class="t">после 21:00 🌙</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ДОГОВОРИЛИСЬ -->
+  <section class="slide" data-i="7">
+    <img class="photo wide" src="img/city.png" alt="">
+    <h1>Супер 💙</h1>
+    <p class="sub">Заберу тебя в <b id="chosenDate">…</b>,<br>как освободишься после 21:00</p>
+    <p class="note">Возьму с собой средство от комаров 🦟<br>Погуляем, покажу тебе другие места, где мы ещё не были, и сделаю тебе видео 🎥</p>
+    <button class="btn" onclick="go(8)">Дальше →</button>
+  </section>
+
+  <!-- 8. P.S. -->
+  <section class="slide" data-i="8">
+    <img class="photo him-solo" src="img/him.png" alt="">
+    <h1>P.S.</h1>
+    <p class="sub">А если совсем по-честному —<br>что мне стоит в себе подтянуть?</p>
+    <textarea data-key="ps_rost" oninput="checkText(this)" placeholder="напиши здесь…"></textarea>
+    <p class="note">Ты мне очень нравишься, и я хочу становиться лучше — может, в том, чего сам не замечаю 💙</p>
+    <button class="btn disabled" data-next onclick="finish(this)">Далее →</button>
+  </section>
+
+  <!-- 9. ФИНАЛ -->
+  <section class="slide" data-i="9">
+    <div class="duo big">
+      <img class="her" src="img/her45.png" alt="">
+      <img class="him" src="img/him45.png" alt="">
+    </div>
+    <h1>Спасибо 💙</h1>
+    <p class="sub">Крепко тебя обнимаю</p>
+    <p class="note">Хорошего тебе настроения — до встречи 🌙</p>
+  </section>
+
+</div>
+
+<script>
+const answers={};
+
+/* сердечки — плотнее */
+(function(){
+  const box=document.getElementById('hearts');
+  const colors=['#5f9df0','#8ec5ff','#b18cff','#7c5cf0','#ffc9e4'];
+  for(let i=0;i<30;i++){
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 32 29');s.setAttribute('class','heart');
+    const size=11+Math.random()*24;
+    s.style.width=size+'px';s.style.left=(Math.random()*100)+'%';
+    s.style.animationDuration=(8+Math.random()*9)+'s';
+    s.style.animationDelay=(-Math.random()*16)+'s';
+    s.innerHTML='<path d="M16 29S2 19.4 2 9.9C2 4.9 5.9 2 9.6 2 12.7 2 15 4 16 6.1 17 4 19.3 2 22.4 2 26.1 2 30 4.9 30 9.9 30 19.4 16 29 16 29z" fill="'+colors[i%5]+'"/>';
+    box.appendChild(s);
+  }
+})();
+
+/* навигация */
+let cur=0;
+function go(i){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.querySelector('.slide[data-i="'+i+'"]').classList.add('active');
+  cur=i;
+}
+function next(btn){
+  if(btn.classList.contains('disabled'))return;
+  const slide=btn.closest('.slide');
+  const ta=slide.querySelector('textarea[data-key]');
+  if(ta)answers[ta.dataset.key]=ta.value.trim();
+  go(cur+1);
+}
+function checkText(ta){
+  const btn=ta.closest('.slide').querySelector('[data-next]');
+  btn.classList.toggle('disabled',ta.value.trim().length===0);
+}
+
+/* да */
+function sayYes(){answers.svidanie="да";burst();setTimeout(()=>go(5),650);}
+function burst(){
+  const box=document.getElementById('hearts');
+  for(let i=0;i<26;i++){
+    const e=document.createElement('div');
+    e.textContent='💙';
+    e.style.cssText='position:fixed;left:50%;top:55%;font-size:'+(18+Math.random()*20)+'px;pointer-events:none;z-index:30;transition:all 1s ease-out;';
+    box.appendChild(e);
+    requestAnimationFrame(()=>{e.style.left=(Math.random()*100)+'%';e.style.top=(Math.random()*100)+'%';e.style.opacity='0';});
+    setTimeout(()=>e.remove(),1100);
+  }
+}
+
+/* кнопка НЕТ */
+const isTouch=('ontouchstart'in window)||navigator.maxTouchPoints>0;
+function fleeTo(btn){
+  btn.classList.add('floating');
+  const bw=btn.offsetWidth,bh=btn.offsetHeight;
+  const x=Math.random()*(innerWidth-bw-16)+8;
+  const y=Math.random()*(innerHeight-bh-16)+8;
+  btn.style.left=x+'px';btn.style.top=y+'px';
+}
+function setupNo(id,onCatch){
+  const btn=document.getElementById(id);
+  if(isTouch){
+    let chaos=null,shrink=1;
+    const startChaos=()=>{
+      if(chaos)return;
+      btn.classList.add('chaos');
+      chaos=setInterval(()=>{fleeTo(btn);},110); // резкий полёт зигзагами
+    };
+    // любое касание — мгновенно убегает + запускает хаос
+    btn.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      shrink=Math.max(.6,shrink*0.9);
+      btn.style.transform='scale('+shrink+')';
+      fleeTo(btn);startChaos();
+    },{passive:false});
+    btn.addEventListener('click',e=>e.preventDefault());
+  }else{
+    btn.addEventListener('mouseenter',()=>fleeTo(btn));
+    btn.addEventListener('click',onCatch);
+  }
+}
+setupNo('no1',()=>go(4));
+setupNo('no2',()=>{
+  const s=document.querySelector('.slide[data-i="5"]');
+  if(!s.querySelector('.kinojoke')){
+    const m=document.createElement('p');m.className='note kinojoke';m.textContent='В кино мы всё равно идём 😄';s.appendChild(m);
+  }
+});
+document.getElementById('tochno').addEventListener('click',e=>{
+  e.preventDefault();document.getElementById('tochnonet').style.visibility='visible';
+});
+
+/* дата */
+function pickDate(el,label){
+  document.querySelectorAll('.datecard').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  answers.data_svidaniya=label;
+  document.getElementById('chosenDate').textContent=label;
+  setTimeout(()=>go(7),450);
+}
+
+/* музыка */
+const audio=document.getElementById('bg');
+const mt=document.getElementById('musicToggle');
+function start(){audio.play().catch(()=>{});mt.style.display='flex';go(1);}
+mt.onclick=()=>{if(audio.paused){audio.play();mt.textContent='🔊';}else{audio.pause();mt.textContent='🔈';}};
+
+/* отправка */
+// ВСТАВЬ СЮДА URL веб-приложения Apps Script (см. инструкцию):
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPC4TySsh5rAUOlajB8VQfG-AXVJdMAKip2vVWqQuKfitIYZsd2YhmFv559s-ePizFSA/exec';
+function finish(btn){
+  if(btn.classList.contains('disabled'))return;
+  const ta=document.querySelector('.slide[data-i="8"] textarea');
+  if(ta)answers.ps_rost=ta.value.trim();
+  answers.time=new Date().toLocaleString('ru-RU');
+  console.log('Ответы Ксюши:',answers);
+  // отправка в Google-таблицу + письмо (fire-and-forget, без CORS-проблем)
+  if(SCRIPT_URL.indexOf('http')===0){
+    try{
+      fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(answers)});
+    }catch(e){console.warn('send failed',e);}
+  }
+  go(9);
+}
+</script>
+</body>
+</html>

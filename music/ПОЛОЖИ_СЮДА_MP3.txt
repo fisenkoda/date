@@ -1,0 +1,2 @@
+Положи сюда mp3 фонового трека и назови файл track.mp3
+(либо поменяй имя в index.html в строке <source src="music/track.mp3">)
