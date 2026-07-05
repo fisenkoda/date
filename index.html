@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Для Ксюши 💙</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
 <style>
   :root{
     --blue:#8ec5ff;
@@ -66,6 +68,9 @@
     background:linear-gradient(135deg,var(--blue),var(--violet));
   }
   .duo.big img{width:168px;height:210px;}
+  .photo.solo-card{width:196px;height:245px;border-radius:22px;object-fit:cover;object-position:center;}
+  .no-hint{font-size:14px;color:var(--ink-soft);opacity:0;transition:opacity .3s;min-height:18px;margin:0;}
+  .no-hint.show{opacity:1;}
 
   /* декоративное голубое сердце для вопроса без фото */
   .deco{width:92px;height:84px;filter:drop-shadow(0 8px 18px rgba(79,151,238,.35));}
@@ -174,20 +179,21 @@
     <h1>Ксюш, я тут кое-что<br>придумал для тебя…</h1>
     <p class="sub">но сначала — пойдёшь со мной на свидание? 💋</p>
     <div class="row">
-      <button class="btn" onclick="sayYes()">Да</button>
+      <button class="btn" onclick="go(4)">Да</button>
       <button class="btn ghost no-btn" id="no1">Нет</button>
     </div>
+    <p class="no-hint" data-hint>Для отказа нажми «Нет» ещё раз</p>
   </section>
 
-  <!-- 4. УВЕРЕНА -->
+  <!-- 4. ПОДТВЕРЖДЕНИЕ (её фото) -->
   <section class="slide" data-i="4">
-    <div class="deco" style="font-size:64px;line-height:1;height:auto">😢</div>
-    <h1>Уверена?</h1>
+    <img class="photo solo-card" src="img/her45.png" alt="">
+    <h1>Ты точно соглашаешься<br>пойти на свидание? 🥹</h1>
     <div class="row">
-      <button class="btn" onclick="sayYes()">Нет, конечно да 💙</button>
-      <button class="btn ghost" id="tochno">Точно нет</button>
+      <button class="btn" onclick="sayYesFinal()">Да, точно</button>
+      <button class="btn ghost no-btn" id="no3">Нет</button>
     </div>
-    <p class="note" id="tochnonet" style="visibility:hidden">эта кнопка, кажется, сломалась 😄</p>
+    <p class="no-hint" data-hint>Для отказа нажми «Нет» ещё раз</p>
   </section>
 
   <!-- 5. КИНО -->
@@ -201,6 +207,7 @@
       <button class="btn" onclick="go(6)">Хорошо, отпрошусь ✅</button>
       <button class="btn ghost no-btn" id="no2">Нет</button>
     </div>
+    <p class="no-hint" data-hint>Для отказа нажми «Нет» ещё раз</p>
   </section>
 
   <!-- 6. ВЫБОР ДАТЫ -->
@@ -290,7 +297,7 @@ function checkText(ta){
 }
 
 /* да */
-function sayYes(){answers.svidanie="да";burst();setTimeout(()=>go(5),650);}
+function sayYesFinal(){answers.svidanie="да";burst();setTimeout(()=>go(5),650);}
 function burst(){
   const box=document.getElementById('hearts');
   for(let i=0;i<26;i++){
@@ -312,8 +319,9 @@ function fleeTo(btn){
   const y=Math.random()*(innerHeight-bh-16)+8;
   btn.style.left=x+'px';btn.style.top=y+'px';
 }
-function setupNo(id,onCatch){
+function setupNo(id){
   const btn=document.getElementById(id);
+  const reveal=()=>{const s=btn.closest('.slide');const h=s.querySelector('[data-hint]');if(h)h.classList.add('show');};
   if(isTouch){
     let chaos=null,shrink=1;
     const startChaos=()=>{
@@ -321,29 +329,24 @@ function setupNo(id,onCatch){
       btn.classList.add('chaos');
       chaos=setInterval(()=>{fleeTo(btn);},110); // резкий полёт зигзагами
     };
-    // любое касание — мгновенно убегает + запускает хаос
+    // любое касание — подсказка + мгновенно убегает + хаос
     btn.addEventListener('touchstart',e=>{
       e.preventDefault();
+      reveal();
       shrink=Math.max(.6,shrink*0.9);
       btn.style.transform='scale('+shrink+')';
       fleeTo(btn);startChaos();
     },{passive:false});
     btn.addEventListener('click',e=>e.preventDefault());
   }else{
+    // наведение — просто убегает; подсказка только если реально попала кликом
     btn.addEventListener('mouseenter',()=>fleeTo(btn));
-    btn.addEventListener('click',onCatch);
+    btn.addEventListener('click',e=>{e.preventDefault();reveal();fleeTo(btn);});
   }
 }
-setupNo('no1',()=>go(4));
-setupNo('no2',()=>{
-  const s=document.querySelector('.slide[data-i="5"]');
-  if(!s.querySelector('.kinojoke')){
-    const m=document.createElement('p');m.className='note kinojoke';m.textContent='В кино мы всё равно идём 😄';s.appendChild(m);
-  }
-});
-document.getElementById('tochno').addEventListener('click',e=>{
-  e.preventDefault();document.getElementById('tochnonet').style.visibility='visible';
-});
+setupNo('no1');
+setupNo('no2');
+setupNo('no3');
 
 /* дата */
 function pickDate(el,label){
