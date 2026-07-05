@@ -113,6 +113,7 @@
   .datecard .t{font-size:14px;color:var(--ink-soft);}
   .datecard.sel{background:linear-gradient(135deg,var(--blue),var(--violet));border-color:transparent;}
   .datecard.sel .dow,.datecard.sel .d,.datecard.sel .t{color:#fff;}
+  .datewrap{display:flex;flex-direction:column;align-items:center;gap:18px;}
 
   .no-btn{position:relative;z-index:5;transition:left .12s,top .12s,transform .18s;}
   .no-btn.floating{position:fixed;}
@@ -216,12 +217,17 @@
     <h1>А ещё 🎥</h1>
     <p class="sub">Хочу украсть тебя на вечер — поедем в город,<br>кое-что для тебя сниму и погуляем 💙</p>
     <p class="note">Когда тебе удобнее?</p>
-    <div class="row">
-      <div class="datecard" onclick="pickDate(this,'Понедельник, 6 июля')">
-        <div class="dow">Понедельник</div><div class="d">6 июля</div><div class="t">после 21:00 🌙</div>
+    <div class="datewrap">
+      <div class="row">
+        <div class="datecard" onclick="pickDate(this,'среду, 9 июля')">
+          <div class="dow">Среда</div><div class="d">9 июля</div><div class="t">как освободишься 🌙</div>
+        </div>
+        <div class="datecard" onclick="pickDate(this,'четверг, 10 июля')">
+          <div class="dow">Четверг</div><div class="d">10 июля</div><div class="t">как освободишься 🌙</div>
+        </div>
       </div>
-      <div class="datecard" onclick="pickDate(this,'Вторник, 7 июля')">
-        <div class="dow">Вторник</div><div class="d">7 июля</div><div class="t">после 21:00 🌙</div>
+      <div class="datecard" onclick="pickDate(this,'пятницу, 11 июля')">
+        <div class="dow">Пятница</div><div class="d">11 июля</div><div class="t">как освободишься 🌙</div>
       </div>
     </div>
   </section>
@@ -230,7 +236,7 @@
   <section class="slide" data-i="7">
     <img class="photo wide" src="img/city.png" alt="">
     <h1>Супер 💙</h1>
-    <p class="sub">Заберу тебя в <b id="chosenDate">…</b>,<br>как освободишься после 21:00</p>
+    <p class="sub">Заберу тебя в <b id="chosenDate">…</b>,<br>как освободишься вечером</p>
     <p class="note">Возьму с собой средство от комаров 🦟<br>Погуляем, покажу тебе другие места, где мы ещё не были, и сделаю тебе видео 🎥</p>
     <button class="btn" onclick="go(8)">Дальше →</button>
   </section>
